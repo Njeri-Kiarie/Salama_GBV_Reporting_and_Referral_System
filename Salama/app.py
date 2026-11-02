@@ -113,7 +113,14 @@ UI_TEXT = {
         "helpline_note": "Contact details and availability should be verified.",
         "find_support_heading": "Find the support you need.",
         "safety_heading": "Before you begin",
-        "safety_description": "Salama provides informational referrals, not emergency intervention, medical diagnosis, or professional counselling. You do not need to share names or identifying details."
+        "safety_description": "Salama provides informational referrals, not emergency intervention, medical diagnosis, or professional counselling. You do not need to share names or identifying details.",
+        "support_availability_message": "Salama currently provides Nairobi-based organisation referrals and national support helplines for other counties.",
+        "available_support_resources": "Available support resources",
+        "contact": "Contact",
+        "organisation": "Organisation",
+        "contact": "Contact",
+        "select_support_warning": "Please select a support service.",
+        "county_support_message": "County-specific organisation referrals are currently available for Nairobi only. National support contacts will be displayed instead."
     },
 
     "Kiswahili": {
@@ -153,7 +160,14 @@ UI_TEXT = {
         "helpline_note": "Tafadhali hakikisha kuwa mawasiliano haya na huduma zake bado zinapatikana.",
         "find_support_heading": "Pata msaada unaohitaji.",
         "safety_heading": "Kabla ya kuanza",
-        "safety_description": "Salama hutoa taarifa kuhusu huduma za msaada, lakini si huduma ya dharura, utambuzi wa kitabibu, au ushauri wa kitaalamu. Si lazima utoe majina au taarifa zinazoweza kukutambulisha."
+        "safety_description": "Salama hutoa taarifa kuhusu huduma za msaada, lakini si huduma ya dharura, utambuzi wa kitabibu, au ushauri wa kitaalamu. Si lazima utoe majina au taarifa zinazoweza kukutambulisha.",
+        "support_availability_message": "Salama kwa sasa hutoa marejeleo ya mashirika ya msaada yanayopatikana Nairobi na nambari za kitaifa za msaada kwa kaunti nyingine.",
+        "available_support_resources": "Rasilimali za msaada zinazopatikana",
+        "contact": "Mawasiliano",
+        "organisation": "Shirika",
+        "contact": "Mawasiliano",
+        "select_support_warning": "Tafadhali chagua aina ya msaada.",
+        "county_support_message": "Marejeleo ya mashirika ya msaada kulingana na kaunti yanapatikana kwa Nairobi pekee kwa sasa. Mawasiliano ya kitaifa ya msaada yataonyeshwa badala yake."
     }
 }
 
@@ -281,8 +295,7 @@ selected_location = st.selectbox(
 location = location_options[selected_location]
 
 st.caption(
-    "Salama currently provides Nairobi-based organisation referrals "
-    "and national support helplines for other counties."
+    t["support_availability_message"]
 )
 
 st.markdown(f"### {t['services_heading']}")
@@ -314,21 +327,28 @@ browse_support = st.button(
 
 if browse_support:
     if support_service is None:
-        st.warning(t["Please select a support service."])
+        st.warning(t["select_support_warning"])
 
     elif location != "Nairobi":
         st.info(
-            "County-specific organisation referrals are currently "
-            "available for Nairobi only. National support contacts "
-            "will be displayed instead."
+            t["county_support_message"]
         )
 
         _, _, national_hotlines = (
             recommendation_engine.load_support_resources()
         )
 
+        national_hotlines_display = national_hotlines[
+            ["organisation", "contact"]
+        ].rename(
+            columns={
+                "organisation": t["organisation"],
+                "contact": t["contact"]
+            }
+        )
+
         st.dataframe(
-            national_hotlines[["organisation", "contact"]],
+            national_hotlines_display,
             hide_index=True,
             use_container_width=True
         )
@@ -339,12 +359,12 @@ if browse_support:
             top_n=5
         )
 
-        st.markdown("#### Available support resources")
+        st.markdown(f"#### {t['available_support_resources']}")
 
         for _, resource in resources.iterrows():
             with st.container(border=True):
                 st.markdown(f"**{resource['organisation']}**")
-                st.write(f"Contact: {resource['contact']}")
+                st.write(f"{t['contact']}: {resource['contact']}")
 
 # Adding the narrative input
 st.markdown(f"### {t['narrative_heading']}")
