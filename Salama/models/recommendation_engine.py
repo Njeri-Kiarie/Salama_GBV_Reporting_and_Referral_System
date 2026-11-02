@@ -16,13 +16,11 @@ def translate_swahili_to_english(text):
     if translation_model is None:
         translation_tokenizer = AutoTokenizer.from_pretrained(
             TRANSLATION_MODEL_NAME,
-            src_lang="swh_Latn",
-            local_files_only=True
+            src_lang="swh_Latn"
         )
 
         translation_model = AutoModelForSeq2SeqLM.from_pretrained(
-            TRANSLATION_MODEL_NAME,
-            local_files_only=True
+            TRANSLATION_MODEL_NAME
         )
 
         translation_model.eval()
